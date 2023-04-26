@@ -16,6 +16,14 @@ sch_name("monitoring_scheme"). // the agent beliefs that it can manage schemes w
 */
 @start_plan
 +!start : org_name(OrgName) & group_name(GroupName) & sch_name(SchemeName) <-
+  createWorkspace(OrgName);
+	joinWorkspace(OrgName,WspID1);
+  makeArtifact(monitoring_org,"ora4mas.nopl.OrgBoard",["src/org/org-spec.xml"], OrgArtId);
+  .broadcast(tell, new_organisation(OrgName, monitoring_org));
+  focus(OrgArtId);
+  // createGroup(my_organisation_group, monitoring_team, GrpArtId)
+  // focus(GrpArtId)
+  // .broadcast(tell, new_group(GrpArtId))
   .print("Hello world").
 
 /* 

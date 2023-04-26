@@ -17,6 +17,12 @@ robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/td
 +!start : true <-
 	.print("Hello world").
 
++new_organisation(Workspace, Artifact) : true <-
+	joinWorkspace(Workspace, WspID1);
+	lookupArtifact(Artifact, OrgArtId);
+	focus(OrgArtId);
+	.print("focused on Organisation").
+
 /* 
  * Plan for reacting to the addition of the goal !manifest_temperature
  * Triggering event: addition of goal !manifest_temperature

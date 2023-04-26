@@ -16,6 +16,14 @@
 +!start : true <-
 	.print("Hello world").
 
+/*
+	found the bug, I wrote "lookUpArtifact" instead of "lookupArtifact" 🙈
+*/
++new_organisation(Workspace, Artifact) : true <-
+	joinWorkspace(Workspace, WspID1);
+	lookupArtifact(Artifact, OrgArtId);
+	focus(OrgArtId);
+	.print("focused on Organisation").
 /* 
  * Plan for reacting to the addition of the goal !read_temperature
  * Triggering event: addition of goal !read_temperature
