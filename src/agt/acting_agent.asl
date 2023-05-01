@@ -33,27 +33,36 @@ role_available(R) :-
 +!start : true <-
 	.print("Hello world").
 
+//
 +new_organisation(Workspace, Artifact) : true <-
 	joinWorkspace(Workspace, WspID1);
 	lookupArtifact(Artifact, OrgArtId);
 	focus(OrgArtId);
 	.print("focused on Organisation").
 
-+new_group(GrpName) : true <-
-	lookupArtifact(GrpName, GrpArtId);
-	focus(GrpArtId);
-	.print("focused on Group: ", GrpName);
-	!check_for_open_roles(GrpArtId).
+// This worked but is not part of the assignemnt as I understand it
+// +new_group(GrpName) : true <-
+// 	lookupArtifact(GrpName, GrpArtId);
+// 	focus(GrpArtId);
+// 	.print("focused on Group: ", GrpName);
+// 	!check_for_open_roles(GrpArtId).
 
-+!check_for_open_roles(GrpArtId) : role(R,G) & role_available(R) & i_have_plans_for(R) <-
-  .print("Found open role: ", R);
+// +!check_for_open_roles(GrpArtId) : role(R,G) & role_available(R) & i_have_plans_for(R) <-
+//   .print("Found open role: ", R);
+//   adoptRole(R).
+
+// +!check_for_open_roles(GrpArtId) : role(R,G) & not role_available(R) & i_have_plans_for(R) <-
+//   .print("Found open role, but it is not available: ", R).
+
+// +!check_for_open_roles(GrpArtId) : role(R,G) & role_available(R) & not i_have_plans_for(R) <-
+//   .print("Found open role, but I do not have plans for it: ", R).
+
++role_available(R, OrgArtId, GrpArtId) : role(R,G) & role_available(R) & i_have_plans_for(R) <-
+  .print("New available Role: ", R);
   adoptRole(R).
 
-+!check_for_open_roles(GrpArtId) : role(R,G) & not role_available(R) & i_have_plans_for(R) <-
-  .print("Found open role, but it is not available: ", R).
-
-+!check_for_open_roles(GrpArtId) : role(R,G) & role_available(R) & not i_have_plans_for(R) <-
-  .print("Found open role, but I do not have plans for it: ", R).
++role_available(R, OrgArtId, GrpArtId) : true <-
+  .print("HERE: ", R).
 
 /* 
  * Plan for reacting to the addition of the goal !manifest_temperature

@@ -5,6 +5,11 @@ org_name("lab_monitoring_org"). // the agent beliefs that it can manage organiza
 group_name("monitoring_team"). // the agent beliefs that it can manage groups with the id "monitoring_team"
 sch_name("monitoring_scheme"). // the agent beliefs that it can manage schemes with the id "monitoring_scheme"
 
+role_fully_covered(R) :- 
+		role_cardinality(R, Min, Max) & 
+		.count(play(_,R,_),NumberOfAgents) & 
+		Min <= NumberOfAgents.
+
 /* Initial goals */
 !start. // the agent has the goal to start
 
@@ -18,22 +23,36 @@ sch_name("monitoring_scheme"). // the agent beliefs that it can manage schemes w
 +!start : org_name(OrgName) & group_name(GroupName) & sch_name(SchemeName) <-
   createWorkspace(OrgName);
 	joinWorkspace(OrgName,WspID1);
+  .print("Creating and deploying Organisation")
   makeArtifact(monitoring_org,"ora4mas.nopl.OrgBoard",["src/org/org-spec.xml"], OrgArtId);
   focus(OrgArtId);
   .broadcast(tell, new_organisation(OrgName, monitoring_org));
-  .print("Created and focused Organisation");
-  // !inspect(GrpArtId);
+  // .print("Created and focused Organisation");
   createGroup(monitoring_team_group, GroupName, GrpArtId);
   focus(GrpArtId);
   .broadcast(tell, new_group(monitoring_team_group));
-  .print("Created and focused Group");
+  // .print("Created and focused Group");
   createScheme(monitoring_scheme, SchemeName, SchArtId);
-  // .broadcast(tell, new_scheme(monitoring_scheme));
   focus(SchArtId);
-  .print("Created and focused Scheme");
+  // .print("Created and focused Scheme");
+  !infere_unoccupied_roles(OrgArtId, GrpArtId);
   ?formationStatus(ok)[artifact_id(GrpArtId)];
   addScheme(monitoring_scheme)[artifact_id(GrpArtId)].
 
+
++!infere_unoccupied_roles(OrgArtId, GrpArtId) : not formationStatus(ok)[artifact_id(GrpArtId)] <-
+  .wait(5000);
+  .print("Checking for unoccupied roles");
+  !check_for_open_roles(OrgArtId, GrpArtId).
+
++!check_for_open_roles(OrgArtId, GrpArtId) :role(R,G) & not role_fully_covered(R)  <-
+  .print("Found unoccupied role in: ", GrpArtId);
+  .print("Broadcasting role to agents!");
+  .broadcast(tell, role_available(R, OrgArtId, GrpArtId));
+  !infere_unoccupied_roles(OrgArtId, GrpArtId).
+
++!check_for_open_roles(OrgArtId, GrpArtId) : true <-
+  .print("Group fully occupied", GrpArtId).
 
 /* 
  * Plan for reacting to the addition of the test-goal ?formationStatus(ok)
