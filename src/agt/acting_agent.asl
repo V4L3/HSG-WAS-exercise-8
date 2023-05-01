@@ -43,8 +43,8 @@ robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/td
 	 * follow the instructions here: https://github.com/HSG-WAS-SS23/exercise-8/blob/main/README.md#test-with-the-real-phantomx-reactor-robot-arm
 	 */
 	// creates a ThingArtifact based on the TD of the robotic arm
-	makeArtifact("leubot1", "org.hyperagents.jacamo.artifacts.wot.ThingArtifact", [Location, true], Leubot1Id); 
-	
+	// makeArtifact("leubot1", "org.hyperagents.jacamo.artifacts.wot.ThingArtifact", [Location, true], Leubot1Id); 
+	makeArtifact("leubot1", "wot.ThingArtifact", [Location, true], Leubot1Id); 
 	// sets the API key for controlling the robotic arm as an authenticated user
 	//setAPIKey("77d7a2250abbdb59c6f6324bf1dcddb5")[artifact_id(leubot1)];
 
