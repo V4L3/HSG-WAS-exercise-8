@@ -4,6 +4,22 @@
 // that describes a Thing of type https://ci.mines-stetienne.fr/kg/ontology#PhantomX
 robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/tds/leubot1.ttl").
 
+/* Initial beliefs and rules */
+
+role_goal(R, G) :-
+	role_mission(R, _, M) & mission_goal(M, G).
+
+can_achieve (G) :-
+	.relevant_plans({+!G[scheme(_)]}, LP) & LP \== [].
+
+i_have_plans_for(R) :-
+       not (role_goal(R, G) & not can_achieve(G)).
+
+role_available(R) :- 
+		role_cardinality(R, Min, Max) & 
+		.count(play(_,R,_),NumberOfAgents) & 
+		Max > NumberOfAgents.
+
 /* Initial goals */
 !start. // the agent has the goal to start
 
@@ -22,6 +38,22 @@ robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/td
 	lookupArtifact(Artifact, OrgArtId);
 	focus(OrgArtId);
 	.print("focused on Organisation").
+
++new_group(GrpName) : true <-
+	lookupArtifact(GrpName, GrpArtId);
+	focus(GrpArtId);
+	.print("focused on Group: ", GrpName);
+	!check_for_open_roles(GrpArtId).
+
++!check_for_open_roles(GrpArtId) : role(R,G) & role_available(R) & i_have_plans_for(R) <-
+  .print("Found open role: ", R);
+  adoptRole(R).
+
++!check_for_open_roles(GrpArtId) : role(R,G) & not role_available(R) & i_have_plans_for(R) <-
+  .print("Found open role, but it is not available: ", R).
+
++!check_for_open_roles(GrpArtId) : role(R,G) & role_available(R) & not i_have_plans_for(R) <-
+  .print("Found open role, but I do not have plans for it: ", R).
 
 /* 
  * Plan for reacting to the addition of the goal !manifest_temperature

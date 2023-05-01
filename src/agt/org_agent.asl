@@ -19,12 +19,21 @@ sch_name("monitoring_scheme"). // the agent beliefs that it can manage schemes w
   createWorkspace(OrgName);
 	joinWorkspace(OrgName,WspID1);
   makeArtifact(monitoring_org,"ora4mas.nopl.OrgBoard",["src/org/org-spec.xml"], OrgArtId);
-  .broadcast(tell, new_organisation(OrgName, monitoring_org));
   focus(OrgArtId);
-  // createGroup(my_organisation_group, monitoring_team, GrpArtId)
-  // focus(GrpArtId)
-  // .broadcast(tell, new_group(GrpArtId))
-  .print("Hello world").
+  .broadcast(tell, new_organisation(OrgName, monitoring_org));
+  .print("Created and focused Organisation");
+  // !inspect(GrpArtId);
+  createGroup(monitoring_team_group, GroupName, GrpArtId);
+  focus(GrpArtId);
+  .broadcast(tell, new_group(monitoring_team_group));
+  .print("Created and focused Group");
+  createScheme(monitoring_scheme, SchemeName, SchArtId);
+  // .broadcast(tell, new_scheme(monitoring_scheme));
+  focus(SchArtId);
+  .print("Created and focused Scheme");
+  ?formationStatus(ok)[artifact_id(GrpArtId)];
+  addScheme(monitoring_scheme)[artifact_id(GrpArtId)].
+
 
 /* 
  * Plan for reacting to the addition of the test-goal ?formationStatus(ok)
