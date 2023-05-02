@@ -27,32 +27,31 @@ role_fully_covered(R) :-
   makeArtifact(monitoring_org,"ora4mas.nopl.OrgBoard",["src/org/org-spec.xml"], OrgArtId);
   focus(OrgArtId);
   .broadcast(tell, new_organisation(OrgName, monitoring_org));
-  // .print("Created and focused Organisation");
   createGroup(monitoring_team_group, GroupName, GrpArtId);
   focus(GrpArtId);
   .broadcast(tell, new_group(monitoring_team_group));
-  // .print("Created and focused Group");
   createScheme(monitoring_scheme, SchemeName, SchArtId);
   focus(SchArtId);
-  // .print("Created and focused Scheme");
-  !infere_unoccupied_roles(OrgArtId, GrpArtId);
   ?formationStatus(ok)[artifact_id(GrpArtId)];
   addScheme(monitoring_scheme)[artifact_id(GrpArtId)].
 
 
-+!infere_unoccupied_roles(OrgArtId, GrpArtId) : not formationStatus(ok)[artifact_id(GrpArtId)] <-
-  .wait(5000);
++!infere_unoccupied_roles(OrgName, GrpName) : not formationStatus(ok)[artifact_id(GrpArtId)] <-
+  .wait(15000);
   .print("Checking for unoccupied roles");
-  !check_for_open_roles(OrgArtId, GrpArtId).
+  !check_for_open_roles(OrgName, GrpName).
 
-+!check_for_open_roles(OrgArtId, GrpArtId) :role(R,G) & not role_fully_covered(R)  <-
-  .print("Found unoccupied role in: ", GrpArtId);
++!infere_unoccupied_roles(OrgName, GrpName) : true <-
+  .print("Formation Status already OK!").
+
++!check_for_open_roles(OrgName, GrpName) : role(R,G) & not role_fully_covered(R)  <-
+  .print("Found unoccupied role (",R,") in: ", GrpName);
   .print("Broadcasting role to agents!");
-  .broadcast(tell, role_available(R, OrgArtId, GrpArtId));
-  !infere_unoccupied_roles(OrgArtId, GrpArtId).
+  .broadcast(tell, role_available(R, OrgArtId, GrpArtId)).
 
-+!check_for_open_roles(OrgArtId, GrpArtId) : true <-
-  .print("Group fully occupied", GrpArtId).
++!check_for_open_roles(OrgName, GrpName) : true <-
+  .print("Group fully occupied", GrpName).
+
 
 /* 
  * Plan for reacting to the addition of the test-goal ?formationStatus(ok)
@@ -64,6 +63,7 @@ role_fully_covered(R) :-
 @test_formation_status_is_ok_plan
 +?formationStatus(ok)[artifact_id(G)] : group(GroupName,_,G)[artifact_id(OrgName)] <-
   .print("Waiting for group ", GroupName," to become well-formed");
+  !infere_unoccupied_roles(OrgName, GroupName);
   .wait({+formationStatus(ok)[artifact_id(G)]}). // waits until the belief is added in the belief base
 
 /* 
